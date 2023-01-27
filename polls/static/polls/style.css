@@ -1,3 +1,8 @@
+body {
+	background: white url("images/background.jpg") no-repeat;
+	background-size: cover;
+	color: #ffffff;
+}
 li a {
 	color: green;
 	text-decoration: none;
