@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from .models import Question
+from .models import Question, Choice
 
 # Create your tests here.
 
@@ -81,7 +81,27 @@ class QuestionDetailViewTests(TestCase):
 
     def test_past_question(self):
         past_question = create_question(
-            question_text = 'Past Question', days=-5)
+            question_text='Past Question', days=-5)
         url = reverse('polls:detail', args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+
+class QuestionResultsViewTests(TestCase):
+    def test_results_view(self):
+        question = create_question(
+            question_text='Question', days=0)
+        question.choice_set.create(choice_text='Choice 1', votes=3)
+        question.choice_set.create(choice_text='Choice 2', votes=0)
+        url = reverse('polls:results', args=(question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_future_results(self):
+        future_question = create_question(
+            question_text="Future Question", days=7)
+        future_question.choice_set.create(choice_text='Choice 1', votes=3)
+        future_question.choice_set.create(choice_text='Choice 2', votes=0)
+        url = reverse('polls:results', args=(future_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
